@@ -1,0 +1,42 @@
+\section{Klasifikacija - klasifikacioni problem}
+
+Klasifikacija predstavlja vrstu mašinskog učenja, koja je podoblast veštačke intaligencije čiji je cilj konstruisanje
+algoritama i računarskih sistema koji su sposobni da se adaptiraju na nove
+situacije i uče na osnovu iskustva. Razvijene su različite tehnike učenja za
+izvršavanje različitih zadataka. Osnovne tehnike se tiču nadgledanog učenja za
+diskreciono donošenje odluka, nadgledanog učenja za kontinuirano predviđanje i
+pojačano učenje za sekvencionalno donošenje odluka, kao i nenadgledano učenje.
+
+Većina praktičnih problema koristi oblik nadgedanog mašinskog učenja.
+Ovaj model podrazumeva primenu nekog algoritma nad skupom ulaznih $X$ i
+izlaznih promenljivih $Y$, trening podaci, za učenje mapiranja $Y \ = \ f(X)$.
+Cilj je proceniti parametre funkcije $f$ tako da se ova funkcija može primeniti
+za nove ulazne podatke $X$ za koje ne znamo izlaz $Y$, test podaci. Podela
+nadgledanog učenja:
+\begin{itemize}
+  \item \textbf{Klasifikacija}: Problem identifikovanja kategorije klase novog
+  posmatranja.
+  \item Regresija: Problem predikcije kvantitivne vrednosti.
+\end{itemize}
+
+Nenadgledano učenje za ulazne podatke $X$ modelira strukture podataka ili
+distribuciju podataka bez povratnih informacija $Y$. Cilj je
+uočavanje zajedničkih svojstava podataka. Ovaj oblik učenja možemo svrstati:
+\begin{itemize}
+  \item Klasterizacija - metod za analizu grupisanja čiji je cilj
+  particionisanje ulznih podataka na $k$ klastera.
+  \item Asocijacija - metod za generaisanje pravila koja opisuju podatke.
+\end{itemize}
+
+Javlja se još jedan oblik mašinskog učenja, polu-nadgledano učenje. Labele su
+dodeljene manjim brojem ulaznih podataka. Razlog može biti cena ručnog
+procesiranja informacija.
+
+Problem sa kojim se mi srećemo je upravo kvalitativne prirode, gde je potrbno
+predvideti da li je komentar spam ili ne. Matematički ovu vrednost možemo
+predstaviti kao binarnu vrednost (spam - 0, nije spam - 1).
+
+Za klasifikaciju podataka se mogu koristiti klasifikatori kao što su logistička
+regresija, linearna diskriminantna analiza, $k$ najbližih komšija, random forest,
+stabla, support vector classifiers i drugi. Problem klasifikacije je složen i ne
+postoji univerzalan klasifikator koji će raditi najbolje u svim situacijama.

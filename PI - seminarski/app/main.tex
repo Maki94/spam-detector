@@ -1,0 +1,134 @@
+\section{Sistem za detktovanje spam komentara}
+
+Za implementaciju ovog sistema korišćen je programski jezik python, pomoćna biblioteka za mašinsko učenje
+scikit-learn i nltk (Natural Language Toolkit) za obradu reči.
+
+Sistem predstavlja konzonlu aplikaciju koja poredi rezultate 4
+algoritma za klasifikaciju nad specifiranim skupom podataka:
+\begin{itemize}
+  \item Linearna regresija - LR
+  \item Linearna diskriminentna anliza - LDA
+  \item Kvadratna diskriminentna anliza - QDA
+  \item Klasifikacija bazirana na potpornim mašinama - support vector classifier (SVC)
+\end{itemize}
+
+Performanse izvršavanja programa nisu uzete u razmatranje zbog toga što se
+treniranje klasifikatora vrši samo jednom. Serijalizacijom iztreniranog klasifikatora
+se može vrišiti predviđanje ostalih ishoda.
+
+\subsection{Opis biblioteka}
+\subsubsection{Scikit-learn}
+
+Scikit-learn je inicijalno razvijen od strane David Cournapeau na \textit{Google summer of code project} 2007. godine.
+I danas je projekat sponzorisan od strane: \textit{INRIA}, \textit{Google}, \textit{Tinyclues} i \textit{the Python Software Foundation}.
+
+Scikit-learn je python biblioteka koja nudi veliki algoritama nadgledanog i nenadgledanog mašinskog učenja.
+Ova biblioteka je izdata pod BSD licencom i koristi sledeće pomoćne biblioteke: \textit{NumPy}, \textit{SciPy}, \textit{Matplotlib}, \textit{IPython}, \textit{Sympy}, \textit{Pandas}.
+
+\subsubsection{Nltk}
+
+Nltk je najpopularnija pythonova open source biblioteka za kreiranje programa koji uključuju interakciju hljudskog govora.
+Inicijalno nudi veliki broj korpus podataka i ostalih leksikografskih resursa, kao
+što je \textit{WordNet}, i biblioteke za procesiranje tekstualnih podataka (classification, tokenization, stemming, tagging, parsing, semantic reasoning).
+
+Iz ove biblioteke koristio sam \textit{WordNetLemmatizer}, \textit{word\_tokenize}, \textit{stopwords} i \textit{PorterStemmer}.
+
+\subsection{Preprocesiranje podataka}
+Skup podataka koji je korišćen je organizovan u dva fajla, skup dobrih i loših
+komentara.
+Primer dobrog komentara:
+\blockquote{
+You have improved greatly in the past years. This is probably the best
+improvement from a artist I have ever seen. I love all the colors you have used
+and how you used them in the before and after. I just love the improvement
+greatly. I can't find any other words to describe the improvement other then
+beautiful, creative, cute, and down right awesome. This is better then I could do
+currently. There is just so much creativity and beautifulness in the improvement
+I can't keep but repeat myself over and over again.
+}
+Primer spam komentara:
+\blockquote{
+i do say its beautiful mothalicka. you should make a commision of this for me.
+its possibly the most hawtest eyes in the hole world. and i've never seen such
+beautiful hurr. (besides mines of course) the legs and arms are such beaituful.
+and do not get me started with that peerrfecct face. the smile is right on key.
+ and dem eyebrows are better den mah watercolors. eye lashes are right on the
+ face,so thats good. but tell dis gurl to get some clothes. gawd. anyways good
+ job gurl. bravo. love it. omg. so hawt. 10/10 watercolors im old greggggggggg.
+}
+
+Kako bismo postigli pouzdanost predviđanjanja potrebno je svaki komentar prevesti
+u niz tokena reči. Pri čemu je za svaku reč potrebno izvršiti normalizaciju,
+normalizacija uključuje navedene korake u nastavku.
+
+Prvi korak u procesiranju podataka je kreiranja liste dobrih i loših komentara.
+Kako bismo postigli veću pouzdanost predviđanjanja potrebno je svaki komentar
+\textbf{tokenizovati} na reči koje je potrebno normalizovati.
+
+Osnovna normalizacija reči obuhvata konvertovanje svih velikih slova reči u
+\textbf{mala slova}. Na ovaj način ćemo tretirati $The$ i $the$ isto. Ovo predstavlja
+osnovnu normalizaciju, nažalost u našem skupu podataka i dalje imamo puno sličnih
+termina koje je potrebno eliminisati.
+
+Sledeći nivo narmalizacije podrazumeva uklanjanje prefiksa i sufiksa reči,
+proces koji je poznatiji kao \textbf{stemming}. Tri najpozantija algoritma koja se
+koriste danas su: Porter, Snowball(Porter2), i Lancaster (Paice-Husk). Porter
+Lancaster je najagresivniji, dok je Porterov algoritam blaži u svođenju reči na
+osnovni oblik, Porter2 predstavlja optimizovaniu varjantu prethodnog algoritma.
+U ovom sistemu je korišćen Porterov algoritam zbog prethodnih karakteristika.
+Primena stimera za reč $lying$ je $lie$.
+
+Kada smo izvršili otklanjanje prefiksa i sufiksa reči, potrebno je svesti dobije
+reč na osnovni oblik ($lemma$), ovaj proces je poznat kao \textbf{lemmatization}.
+Primer lemmatizera za reč $women$ je $woman$.
+
+Pored ovih načina normalizacije postoje i dodatne koje nisu uključene u ovaj sistem,
+recimo identifikovanje nestandardnih reči (identifikovanje brojeva, datuma, skraćenica). Na primer,
+svaki broj bi mogao biti sveden na isti token, takođe i svaki akronim. Na ovaj
+način bi vokabular ostao manji što bi poboljšalo preciznost klasifikatora.
+
+
+\subsection{Treniranje klasifikatora}
+Kako bismo trenirali kalasifajer potrebno je uočiti karakteristike podataka
+koje utiču na ishod klasifikacije.
+
+Neke od mera primenjenih nad dataset-om u ovom sistemu su:
+\begin{itemize}
+  \item Broj karaktera
+  \item Broj jedinstvenih karaktera
+  \item Odnos broja jedinstvenih karaktera i ukupnog broja karaktera
+  \item Broj reči
+  \item Da li je učestalost reči najčešće pojavljivane reči veća od 50\%
+\end{itemize}
+
+Nakon formiranja matrice sa pet kolana, potrebno je podeliti skup podataka na
+skup podataka za treniranje i testiranje.
+
+Za podelu podataka je korišćenja urkštena validacija (\textit{cross-validation}),
+koja obezbeđuje reprezentativnost uzoraka za testiranje. Podela je izvršena
+u odnosu 8:2.
+
+\subsection{Rezultati}
+
+Učenje klasifajera je izvršeno nad 912 komentara, dok je testiranje izvršeno nad
+228 podataka. Statistika dobijenih rezultata je prikazana u tabeli [Table\ref{tab:rezultati}].
+
+\begin{table}[H]
+  \caption{Poređenje rezultata nad 228 testova}
+  \label{tab:rezultati}
+  \centering
+  \begin{tabular}{ | l | l | l |}
+    \hline
+  Klasifikator & broj uspešnih testova & preciznost \\ \hline
+  Linearna regresija & 211 & 0.9254 \\ \hline
+  Linearna diskriminentna anliza &  212 & 0.9298 \\ \hline
+  Kvadratna diskriminentna anliza &  201 & 0.8816 \\ \hline
+  Support vector classifier & 211 & 0.9254 \\
+  \hline
+  \end{tabular}
+\end{table}
+
+
+Možemo zaključiti da je najbolje rezultate dala linearna diskriminentna analiza.
+Razlike između LR, LDA i SVC je veoma mala, dok sa druge strane QDA je zbog
+veće fleksibilnosti imala više promašaja.
